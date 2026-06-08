@@ -55,7 +55,6 @@
   .toast { position: fixed; bottom: 24px; right: 24px; background: #1D9E75; color: white; padding: 11px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
   .toast.show { opacity: 1; }
 
-  /* ── Modal de mapeamento de colunas ── */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
   .modal { background: #fff; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
   .modal h2 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
@@ -114,12 +113,11 @@
 
 </div>
 <script>
-// ─── ESTADO GLOBAL ───────────────────────────────────────────────
+ 
 const lideresMemoria = {};
 const presencialMemoria = {};
 let dadosGlobal = [];
 
-// ─── MAPA DE PROBLEMAS ───────────────────────────────────────────
 const MAPA_PROBLEMAS = [
   { chaves: ['[latam] delivered but not received', 'delivered but not received'], saida: 'Assinado não recebido' },
   { chaves: ['assinado nao recebido/签收未收到', 'assinado nao recebido'],         saida: 'Assinado não recebido' },
@@ -131,9 +129,7 @@ const MAPA_PROBLEMAS = [
   { chaves: ['troca de etiqueta', 'troca'],                                        saida: 'Troca de etiqueta'     },
 ];
 
-// ─── DEFINIÇÃO DOS CAMPOS ────────────────────────────────────────
-// id: chave interna | label: nome exibido | obrigatorio: se true bloqueia sem ele
-// candidatos: nomes comuns que tentamos detectar automaticamente
+
 const CAMPOS = [
   { id: 'remessa',      label: 'Remessa / Nº do pedido',        obrigatorio: true,  candidatos: ['remessa', 'numero do pedido', 'pedido'] },
   { id: 'problema',     label: 'Tipo de problema (nível 2)',     obrigatorio: true,  candidatos: ['tipo de item problematico nivel 2', 'tipo de item problematico', 'problema nivel 2', 'nivel 2'] },
@@ -147,7 +143,6 @@ const CAMPOS = [
   { id: 'rne',          label: 'RNE / Focal',                    obrigatorio: false, candidatos: ['rne'] },
 ];
 
-// ─── UTILITÁRIOS ─────────────────────────────────────────────────
 
 function strip(s) {
   return String(s || '').toLowerCase().trim()
@@ -183,15 +178,14 @@ function encontrarAba(wb) {
   return wb.SheetNames[wb.SheetNames.length - 1];
 }
 
-// Tenta encontrar a melhor coluna para um campo pelos candidatos
 function detectarColuna(cols, candidatos) {
-  // 1. Correspondência exata (sem acentos)
-  for (const c of candidatos) {
+
+ for (const c of candidatos) {
     const cl = strip(c);
     for (const col of cols) if (strip(col) === cl) return col;
   }
-  // 2. Correspondência parcial
-  for (const c of candidatos) {
+
+ for (const c of candidatos) {
     const cl = strip(c);
     for (const col of cols) if (strip(col).includes(cl)) return col;
   }
@@ -241,10 +235,7 @@ function artigo_embarcador(nome) {
   return 'do';
 }
 
-// ─── MAPEAMENTO DE COLUNAS (localStorage) ────────────────────────
-// Salva e carrega o mapeamento coluna→campo por "assinatura" da planilha
-// A assinatura é o conjunto de colunas ordenado — se o arquivo mudar as colunas,
-// considera uma planilha nova e pede remapeamento
+
 
 function assinatura(cols) {
   return cols.slice().sort().join('|');
@@ -270,12 +261,10 @@ function limparMapeamentos() {
   } catch(e) {}
 }
 
-// ─── MODAL DE MAPEAMENTO DE COLUNAS ──────────────────────────────
 
 function abrirModalMapeamento(cols, mapeamentoAtual, foiSalvo, onConfirm) {
   const mc = document.getElementById('modal-container');
 
-  // Monta opções do select
   const opts = `<option value="">— não usar —</option>` +
     cols.map(c => `<option value="${c.replace(/"/g,'&quot;')}">${c}</option>`).join('');
 
@@ -325,7 +314,6 @@ function abrirModalMapeamento(cols, mapeamentoAtual, foiSalvo, onConfirm) {
     document.getElementById('modal-saved-notice').style.display = 'block';
   }
 
-  // Colorir selects quando usuário muda
   CAMPOS.forEach(campo => {
     const sel = document.getElementById('map-' + campo.id);
     if (sel) sel.addEventListener('change', () => {
@@ -333,15 +321,12 @@ function abrirModalMapeamento(cols, mapeamentoAtual, foiSalvo, onConfirm) {
     });
   });
 
-  // Botão confirmar — sem passar cols pelo HTML
   document.getElementById('btn-confirmar-mapa').addEventListener('click', () => confirmarMapeamento());
 
-  // Fechar ao clicar fora do modal
   document.querySelector('#modal-container .modal-overlay').addEventListener('click', function(e) {
     if (e.target === this) fecharModal();
   });
 
-  // Guarda cols e callback em variáveis globais seguras
   window._colsParaMapeamento = cols;
   window._onConfirmMapeamento = onConfirm;
 }
@@ -367,7 +352,6 @@ function confirmarMapeamento() {
     return;
   }
 
-  // Salva no localStorage
   const sig = assinatura(cols);
   salvarMapeamento(sig, mapa);
 
@@ -376,14 +360,12 @@ function confirmarMapeamento() {
   if (window._onConfirmMapeamento) window._onConfirmMapeamento(mapa);
 }
 
-// Fechar modal com ESC
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && document.getElementById('modal-container').innerHTML) {
     fecharModal();
   }
 });
 
-// ─── PROCESSAMENTO DOS DADOS ──────────────────────────────────────
 
 function processarDados(raw, mapa) {
   let ignorados = 0;
@@ -407,7 +389,6 @@ function processarDados(raw, mapa) {
   return { dados, ignorados };
 }
 
-// ─── GERAÇÃO DE MENSAGENS ────────────────────────────────────────
 
 function gerarMensagemWpp(row, assistente) {
   const nome = row.destinatario || 'Cliente';
@@ -447,7 +428,6 @@ function gerarTemplateFeishu(row, assistente, lider, presencial) {
   ].join('\n');
 }
 
-// ─── AÇÕES DOS BOTÕES ────────────────────────────────────────────
 
 function copiarFeishu(idx) {
   const row = dadosGlobal[idx];
@@ -515,7 +495,6 @@ function togglePresencial(idx, checked) {
   atualizarStats();
 }
 
-// Gera os botões de WhatsApp (Web + App) ou botão de sem número
 function gerarBotoesWpp(row, presencial, assistente) {
   if (presencial) {
     return `<button class="btn btn-red" disabled><i class="ti ti-phone-off"></i> Sem número</button>`;
@@ -544,7 +523,6 @@ function trocarPlanilha() {
   recriarInputArquivo().click();
 }
 
-// ─── ESTATÍSTICAS ─────────────────────────────────────────────────
 
 function atualizarStats() {
   const pres = dadosGlobal.filter(r => isNumeroInvalido(r.tel) || !!presencialMemoria[r.remessa]).length;
@@ -553,7 +531,6 @@ function atualizarStats() {
   document.getElementById('st-pres').textContent  = pres;
 }
 
-// ─── RENDERIZAÇÃO DOS CARDS ───────────────────────────────────────
 
 function finalizarCarregamento(abaNome, raw, ignorados) {
   document.getElementById('info-bar').style.display = 'flex';
@@ -644,7 +621,6 @@ function renderCards() {
   }).join('');
 }
 
-// ─── LEITURA DO ARQUIVO ───────────────────────────────────────────
 
 function recriarInputArquivo() {
   const old = document.getElementById('file-input');
@@ -672,20 +648,16 @@ function handleFileChange(e) {
       const cols = Object.keys(raw[0]);
       const sig  = assinatura(cols);
 
-      // Tenta mapeamento salvo primeiro
       const mapaSalvo = carregarMapeamento(sig);
       const foiSalvo  = !!mapaSalvo;
 
-      // Detecta automaticamente o que conseguir
       const mapaAuto = {};
       CAMPOS.forEach(campo => {
         mapaAuto[campo.id] = detectarColuna(cols, campo.candidatos);
       });
 
-      // Se tiver mapeamento salvo, usa ele como base; senão usa o automático
       const mapaInicial = mapaSalvo || mapaAuto;
 
-      // Sempre mostra o modal para o usuário confirmar
       abrirModalMapeamento(cols, mapaInicial, foiSalvo, (mapaConfirmado) => {
         const { dados, ignorados } = processarDados(raw, mapaConfirmado);
         dadosGlobal = dados;
