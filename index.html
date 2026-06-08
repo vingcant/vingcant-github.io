@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Acareações — J&T Express</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 1.5rem; }
+  .container { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.5rem; color: #111; }
+  .stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .stat { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 8px 16px; font-size: 13px; color: #555; }
+  .stat span { font-weight: 600; color: #111; }
+  .upload-area { border: 2px dashed #ccc; border-radius: 12px; padding: 3rem; text-align: center; color: #888; font-size: 14px; margin-bottom: 1.5rem; cursor: pointer; transition: background 0.15s; background: #fff; }
+  .upload-area:hover { background: #fafafa; border-color: #aaa; }
+  .upload-area i { font-size: 36px; display: block; margin-bottom: 10px; color: #bbb; }
+  .assistente-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px 16px; flex-wrap: wrap; }
+  .assistente-bar label { font-size: 13px; color: #555; white-space: nowrap; }
+  .assistente-bar input { font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid #ddd; color: #111; width: 200px; font-family: inherit; }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+  .filter-bar select, .filter-bar input[type=text] { font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #111; font-family: inherit; }
+  .info-bar { background: #f0f4ff; border: 1px solid #c7d4f5; border-radius: 8px; padding: 8px 14px; font-size: 12px; color: #444; margin-bottom: 1rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+  .card.presencial { border-left: 4px solid #E24B4A; }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #111; }
+  .card-subtitle { font-size: 12px; color: #777; margin-top: 2px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
+  .badge { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; }
+  .badge-red { background: #FCEBEB; color: #A32D2D; }
+  .badge-blue { background: #E6F1FB; color: #185FA5; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-green { background: #E1F5EE; color: #0F6E56; }
+  .badge-gray { background: #F0F0F0; color: #888; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 16px; margin-bottom: 14px; }
+  .field { font-size: 12px; }
+  .field-label { color: #999; margin-bottom: 2px; }
+  .field-value { color: #111; font-weight: 500; word-break: break-word; }
+  .card-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 6px 13px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #333; cursor: pointer; text-decoration: none; transition: background 0.15s; font-family: inherit; }
+  .btn:hover { background: #f5f5f5; }
+  .btn-green { border-color: #1D9E75; color: #0F6E56; }
+  .btn-green:hover { background: #E1F5EE; }
+  .btn-blue { border-color: #378ADD; color: #185FA5; }
+  .btn-blue:hover { background: #E6F1FB; }
+  .btn-copied { border-color: #1D9E75; color: #0F6E56; background: #E1F5EE; }
+  .btn-red { border-color: #D85A30; color: #993C1D; opacity: 0.6; cursor: not-allowed; }
+  .btn-sm { padding: 3px 10px; font-size: 11px; }
+  .lider-input { font-size: 12px; padding: 5px 9px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; color: #111; width: 140px; font-family: inherit; }
+  .toggle-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; cursor: pointer; user-select: none; }
+  .empty { text-align: center; color: #bbb; padding: 3rem 1rem; font-size: 14px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #1D9E75; color: white; padding: 11px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .toast.show { opacity: 1; }
+
+  /* ── Modal de mapeamento de colunas ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .modal { background: #fff; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+  .modal h2 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .modal .modal-sub { font-size: 12px; color: #888; margin-bottom: 1.25rem; }
+  .modal-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .modal-row label { font-size: 13px; color: #444; width: 170px; flex-shrink: 0; }
+  .modal-row label span.req { color: #E24B4A; margin-left: 2px; }
+  .modal-row select { flex: 1; font-size: 13px; padding: 5px 8px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #111; font-family: inherit; }
+  .modal-row select.auto { border-color: #1D9E75; background: #f4fdf9; }
+  .modal-row select.missing { border-color: #E24B4A; background: #fff8f8; }
+  .modal-legend { display: flex; gap: 12px; font-size: 11px; color: #888; margin-bottom: 1rem; flex-wrap: wrap; }
+  .modal-legend span { display: flex; align-items: center; gap: 4px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-green { background: #1D9E75; }
+  .dot-red { background: #E24B4A; }
+  .dot-gray { background: #ccc; }
+  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #eee; }
+  .modal-saved-notice { background: #E1F5EE; border: 1px solid #1D9E75; border-radius: 6px; padding: 6px 10px; font-size: 12px; color: #0F6E56; margin-bottom: 1rem; display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Painel de Acareações — J&T Express</h1>
+
+<div class="assistente-bar">
+  <label for="assistente-input"><i class="ti ti-user"></i> Atendente responsável:</label>
+  <input id="assistente-input" type="text" placeholder="Seu nome">
+</div>
+
+<div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+  <i class="ti ti-file-spreadsheet"></i>
+  Clique para carregar o Excel do BI
+  <div style="font-size:12px;margin-top:8px;color:#bbb;">Arquivo .xlsx exportado do BI</div>
+  <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none">
+</div>
+
+<div class="info-bar" id="info-bar" style="display:none"></div>
+
+<div class="stats" id="stats" style="display:none">
+  <div class="stat">Acareações: <span id="st-total">0</span></div>
+  <div class="stat">WhatsApp: <span id="st-wp">0</span></div>
+  <div class="stat">Presencial: <span id="st-pres">0</span></div>
+</div>
+
+<div class="filter-bar" id="filter-bar" style="display:none">
+  <i class="ti ti-filter" style="color:#bbb;font-size:16px;"></i>
+  <select id="filter-base"><option value="">Todas as bases</option></select>
+  <select id="filter-problema"><option value="">Todos os tipos</option></select>
+  <input type="text" id="filter-search" placeholder="Buscar remessa..." style="width:170px;">
+</div>
+
+<div id="cards-container"></div>
+<div class="toast" id="toast"></div>
+<div id="modal-container"></div>
+
+</div>
+<script>
+// ─── ESTADO GLOBAL ───────────────────────────────────────────────
+const lideresMemoria = {};
+const presencialMemoria = {};
+let dadosGlobal = [];
+
+// ─── MAPA DE PROBLEMAS ───────────────────────────────────────────
+const MAPA_PROBLEMAS = [
+  { chaves: ['[latam] delivered but not received', 'delivered but not received'], saida: 'Assinado não recebido' },
+  { chaves: ['assinado nao recebido/签收未收到', 'assinado nao recebido'],         saida: 'Assinado não recebido' },
+  { chaves: ['verificacao do pod/pod核实', 'verificacao do pod'],                  saida: 'Verificação do POD'    },
+  { chaves: ['item damaged (packing damaged)', 'avaria apos entrega', 'avaria apos', 'danificado'], saida: 'Avaria após entrega' },
+  { chaves: ['incorrect item', 'incorreto'],                                       saida: 'Item incorreto'        },
+  { chaves: ['missing item or empty package'],                                     saida: 'Missing Item Or Empty Package' },
+  { chaves: ['pacote perdido'],                                                    saida: 'Pacote Perdido'        },
+  { chaves: ['troca de etiqueta', 'troca'],                                        saida: 'Troca de etiqueta'     },
+];
+
+// ─── DEFINIÇÃO DOS CAMPOS ────────────────────────────────────────
+// id: chave interna | label: nome exibido | obrigatorio: se true bloqueia sem ele
+// candidatos: nomes comuns que tentamos detectar automaticamente
+const CAMPOS = [
+  { id: 'remessa',      label: 'Remessa / Nº do pedido',        obrigatorio: true,  candidatos: ['remessa', 'numero do pedido', 'pedido'] },
+  { id: 'problema',     label: 'Tipo de problema (nível 2)',     obrigatorio: true,  candidatos: ['tipo de item problematico nivel 2', 'tipo de item problematico', 'problema nivel 2', 'nivel 2'] },
+  { id: 'base',         label: 'Base responsável',               obrigatorio: true,  candidatos: ['base responsavel', 'base responsável', 'base'] },
+  { id: 'tel',          label: 'Telefone do destinatário',       obrigatorio: false, candidatos: ['telefone do destinatario', 'telefone do destinatário', 'telefone', 'tel', 'fone', 'contato'] },
+  { id: 'entregador',   label: 'Entregador',                     obrigatorio: false, candidatos: ['entregador'] },
+  { id: 'dataBaixa',    label: 'Data da entrega / baixa',        obrigatorio: false, candidatos: ['data da entrega', 'data de entrega', 'data baixa', 'horario entrega'] },
+  { id: 'prazo',        label: 'Prazo regional / vencimento',    obrigatorio: false, candidatos: ['prazo regional', 'prazo', 'vencimento'] },
+  { id: 'embarcador',   label: 'Embarcador / Origem do pedido',  obrigatorio: false, candidatos: ['origem do pedido', 'embarcador', 'loja', 'origem'] },
+  { id: 'destinatario', label: 'Nome do destinatário',           obrigatorio: false, candidatos: ['nome do destinatario', 'nome do destinatário', 'destinatario', 'destinatário', 'cliente'] },
+  { id: 'rne',          label: 'RNE / Focal',                    obrigatorio: false, candidatos: ['rne'] },
+];
+
+// ─── UTILITÁRIOS ─────────────────────────────────────────────────
+
+function strip(s) {
+  return String(s || '').toLowerCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function normalizar_problema(v) {
+  const s = strip(v);
+  if (!s) return null;
+  for (const entry of MAPA_PROBLEMAS)
+    for (const chave of entry.chaves)
+      if (s === chave || s.includes(chave)) return entry.saida;
+  return null;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function encontrarAba(wb) {
+  for (const name of wb.SheetNames)
+    if (name.toLowerCase().includes('export')) return name;
+  for (const name of wb.SheetNames) {
+    const raw = XLSX.utils.sheet_to_json(wb.Sheets[name], { defval: '', range: 0 });
+    if (raw.length > 1) {
+      const cols = Object.keys(raw[0]).join(' ').toLowerCase();
+      if (cols.includes('base responsavel')) return name;
+    }
+  }
+  return wb.SheetNames[wb.SheetNames.length - 1];
+}
+
+// Tenta encontrar a melhor coluna para um campo pelos candidatos
+function detectarColuna(cols, candidatos) {
+  // 1. Correspondência exata (sem acentos)
+  for (const c of candidatos) {
+    const cl = strip(c);
+    for (const col of cols) if (strip(col) === cl) return col;
+  }
+  // 2. Correspondência parcial
+  for (const c of candidatos) {
+    const cl = strip(c);
+    for (const col of cols) if (strip(col).includes(cl)) return col;
+  }
+  return null;
+}
+
+function tratarNumero(v) {
+  if (v === null || v === undefined || String(v).trim() === '') return '';
+  const s = String(v).trim();
+  const n = parseFloat(s);
+  if (!isNaN(n) && s.match(/^[\d.eE+\-]+$/)) return String(Math.round(n));
+  return s;
+}
+
+function normalizar_embarcador(v) {
+  const s = String(v || '').toLowerCase().trim();
+  const mapa = { shein:'Shein', cainiao:'Cainiao', mercado:'Mercado Livre', shopee:'Shopee', temu:'Temu', wepink:'WePink', jequiti:'Jequiti' };
+  for (const k in mapa) if (s.includes(k)) return mapa[k];
+  return s.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatarDataExcel(v) {
+  if (v === null || v === undefined || String(v).trim() === '' || String(v) === 'NaN') return 'N/A';
+  let d;
+  if (typeof v === 'number') d = new Date(Math.round((v - 25569) * 86400 * 1000));
+  else if (v instanceof Date) d = v;
+  else d = new Date(v);
+  if (isNaN(d)) return String(v).trim() || 'N/A';
+  const pad = n => String(n).padStart(2, '0');
+  const data = `${pad(d.getUTCDate())}/${pad(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`;
+  const hora = d.getUTCHours(), min = d.getUTCMinutes();
+  return (hora === 0 && min === 0) ? data : `${data} às ${pad(hora)}h${pad(min)}`;
+}
+
+function isNumeroInvalido(tel) {
+  const t = String(tel || '').replace(/\D/g, '');
+  return !t || t === '0' || t === '00' || t.length < 8;
+}
+
+function artigo_embarcador(nome) {
+  const n = String(nome).toLowerCase();
+  if (['mercado', 'mercado livre', 'magalu'].some(m => n.includes(m))) return 'do';
+  if (['cainiao', 'shein',''].some(m => n.includes(m))) return 'da';
+  if (['wepink'].some(m => n.includes(m))) return 'na';
+  if (['tiktok'].some(m => n.includes(m))) return 'no';
+  if (nome.match(/[aei]$/i)) return 'da';
+  return 'do';
+}
+
+// ─── MAPEAMENTO DE COLUNAS (localStorage) ────────────────────────
+// Salva e carrega o mapeamento coluna→campo por "assinatura" da planilha
+// A assinatura é o conjunto de colunas ordenado — se o arquivo mudar as colunas,
+// considera uma planilha nova e pede remapeamento
+
+function assinatura(cols) {
+  return cols.slice().sort().join('|');
+}
+
+function carregarMapeamento(sig) {
+  try {
+    const raw = localStorage.getItem('col_map_' + btoa(sig).slice(0,40));
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function salvarMapeamento(sig, mapa) {
+  try {
+    localStorage.setItem('col_map_' + btoa(sig).slice(0,40), JSON.stringify(mapa));
+  } catch(e) {}
+}
+
+function limparMapeamentos() {
+  try {
+    Object.keys(localStorage).filter(k => k.startsWith('col_map_')).forEach(k => localStorage.removeItem(k));
+    showToast('Mapeamentos apagados!');
+  } catch(e) {}
+}
+
+// ─── MODAL DE MAPEAMENTO DE COLUNAS ──────────────────────────────
+
+function abrirModalMapeamento(cols, mapeamentoAtual, foiSalvo, onConfirm) {
+  const mc = document.getElementById('modal-container');
+
+  // Monta opções do select
+  const opts = `<option value="">— não usar —</option>` +
+    cols.map(c => `<option value="${c.replace(/"/g,'&quot;')}">${c}</option>`).join('');
+
+  const linhas = CAMPOS.map(campo => {
+    const colAtual = mapeamentoAtual[campo.id] || '';
+    const autoDetectado = !!colAtual;
+    const cls = autoDetectado ? 'auto' : (campo.obrigatorio ? 'missing' : '');
+    return `
+    <div class="modal-row">
+      <label>${campo.label}${campo.obrigatorio ? '<span class="req">*</span>' : ''}</label>
+      <select id="map-${campo.id}" class="${cls}">
+        ${cols.map(c => `<option value="${c.replace(/"/g,'&quot;')}" ${c === colAtual ? 'selected' : ''}>${c}</option>`).join('')}
+        <option value="" ${!colAtual ? 'selected' : ''}>— não usar —</option>
+      </select>
+    </div>`;
+  }).join('');
+
+  mc.innerHTML = `
+  <div class="modal-overlay">
+    <div class="modal">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <h2><i class="ti ti-table-options"></i> Confirme as colunas da planilha</h2>
+        <button class="btn btn-sm" onclick="fecharModal()" title="Fechar (ESC)" style="border:none;background:none;font-size:18px;color:#aaa;padding:2px 6px;cursor:pointer;">&#x2715;</button>
+      </div>
+      <p class="modal-sub">Verifique se cada campo foi associado à coluna correta. Este mapeamento será salvo automaticamente para esta planilha.</p>
+      <div class="modal-saved-notice" id="modal-saved-notice">
+        <i class="ti ti-check"></i> Mapeamento salvo anteriormente — verifique se ainda está correto.
+      </div>
+      <div class="modal-legend">
+        <span><span class="dot dot-green"></span> Detectado automaticamente</span>
+        <span><span class="dot dot-red"></span> Obrigatório não encontrado</span>
+        <span><span class="dot dot-gray"></span> Opcional não encontrado</span>
+      </div>
+      ${linhas}
+      <div class="modal-footer">
+        <button class="btn btn-sm" onclick="limparMapeamentos()">
+          <i class="ti ti-trash"></i> Limpar mapeamentos salvos
+        </button>
+        <button class="btn btn-blue btn-sm" id="btn-confirmar-mapa">
+          <i class="ti ti-check"></i> Confirmar e carregar
+        </button>
+      </div>
+    </div>
+  </div>`;
+
+  if (foiSalvo) {
+    document.getElementById('modal-saved-notice').style.display = 'block';
+  }
+
+  // Colorir selects quando usuário muda
+  CAMPOS.forEach(campo => {
+    const sel = document.getElementById('map-' + campo.id);
+    if (sel) sel.addEventListener('change', () => {
+      sel.className = sel.value ? 'auto' : (campo.obrigatorio ? 'missing' : '');
+    });
+  });
+
+  // Botão confirmar — sem passar cols pelo HTML
+  document.getElementById('btn-confirmar-mapa').addEventListener('click', () => confirmarMapeamento());
+
+  // Fechar ao clicar fora do modal
+  document.querySelector('#modal-container .modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) fecharModal();
+  });
+
+  // Guarda cols e callback em variáveis globais seguras
+  window._colsParaMapeamento = cols;
+  window._onConfirmMapeamento = onConfirm;
+}
+
+function fecharModal() {
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+function confirmarMapeamento() {
+  const cols = window._colsParaMapeamento;
+  const mapa = {};
+  let faltando = [];
+
+  CAMPOS.forEach(campo => {
+    const sel = document.getElementById('map-' + campo.id);
+    const val = sel ? sel.value : '';
+    mapa[campo.id] = val || null;
+    if (campo.obrigatorio && !val) faltando.push(campo.label);
+  });
+
+  if (faltando.length) {
+    alert('Os seguintes campos obrigatórios não foram mapeados:\n• ' + faltando.join('\n• '));
+    return;
+  }
+
+  // Salva no localStorage
+  const sig = assinatura(cols);
+  salvarMapeamento(sig, mapa);
+
+  fecharModal();
+
+  if (window._onConfirmMapeamento) window._onConfirmMapeamento(mapa);
+}
+
+// Fechar modal com ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('modal-container').innerHTML) {
+    fecharModal();
+  }
+});
+
+// ─── PROCESSAMENTO DOS DADOS ──────────────────────────────────────
+
+function processarDados(raw, mapa) {
+  let ignorados = 0;
+  const dados = raw.map(r => {
+    const prob = normalizar_problema(mapa.problema ? r[mapa.problema] : '');
+    if (!prob) { ignorados++; return null; }
+    const base = mapa.base ? String(r[mapa.base] || '').toUpperCase().trim() : 'N/A';
+    return {
+      remessa:      mapa.remessa      ? tratarNumero(r[mapa.remessa])                          : '',
+      tel:          mapa.tel          ? String(r[mapa.tel]          || '').trim()              : '',
+      entregador:   mapa.entregador   ? String(r[mapa.entregador]   || 'N/A').trim()           : 'N/A',
+      dataBaixa:    mapa.dataBaixa    ? formatarDataExcel(r[mapa.dataBaixa])                   : 'N/A',
+      vencimento:   mapa.prazo        ? formatarDataExcel(r[mapa.prazo])                       : 'N/A',
+      base,
+      embarcador:   mapa.embarcador   ? normalizar_embarcador(r[mapa.embarcador])              : 'N/A',
+      problema:     prob,
+      destinatario: mapa.destinatario ? String(r[mapa.destinatario] || 'Cliente').trim()       : 'Cliente',
+      rne:          mapa.rne          ? String(r[mapa.rne]          || '').trim()              : '',
+    };
+  }).filter(Boolean);
+  return { dados, ignorados };
+}
+
+// ─── GERAÇÃO DE MENSAGENS ────────────────────────────────────────
+
+function gerarMensagemWpp(row, assistente) {
+  const nome = row.destinatario || 'Cliente';
+  const emb  = row.embarcador   || 'N/A';
+  const rem  = row.remessa      || 'N/A';
+  const data = row.dataBaixa    || 'N/A';
+
+  if (emb.toLowerCase().includes('mercado')) {
+    return `Olá, *${nome}*!\n\nMe chamo ${assistente} e sou da Transportadora J&T Express, parceira de entregas do *Mercado Livre*.\n\nVerificamos que você abriu uma reclamação referente ao produto *N/A*, ID *${rem}* e entregue dia *${data}*.\n\nPara que possamos auxiliar, escolha uma opção:\n\n1 - Recebi o produto\n2 - Não recebi o produto\n3 - Recebi o pacote com produtos faltantes\n4 - Recebi o produto com defeito\n5 - Recebi um produto diferente do comprado`;
+  }
+
+  if (emb.toLowerCase().includes('tiktok')) {
+    return `Olá, *${nome}*!\n\nMeu nome é ${assistente}, representante da transportadora J&T Express.\n\nVerificamos que você abriu uma reclamação referente ao pedido *${rem}*, realizado na *${emb}*.\n\nPara que possamos auxiliar, escolha uma das opções abaixo e responda apenas com o n°:\n\n1 - Recebi o produto.\n2 - Recebi o produto, corretamente lacrado e embalado.\n3 - Não recebi o produto\n4 - Recebi o produto com itens faltantes\n5 - Recebi o produto, porém com a embalagem externa em más condições.\n6 - Recebi o produto diferente do que comprei\n7 - Recebi o produto com defeito`;
+  }
+
+  if (emb.toLowerCase().includes('wepink')) {
+    return `Olá, *${nome}*!\n\nMeu nome é ${assistente}, representante da transportadora J&T Express.\n\nVerificamos que você abriu uma reclamação referente ao pedido *${rem}*, realizado na *${emb}*.\n\nPara que possamos auxiliar, escolha uma das opções abaixo e responda apenas com o n°:\n\n1 - Recebi o produto.\n2 - Recebi o produto, corretamente lacrado e embalado.\n3 - Não recebi o produto\n4 - Recebi o produto com itens faltantes\n5 - Recebi o produto, porém com a embalagem externa em más condições.\n6 - Recebi o produto diferente do que comprei\n7 - Recebi o produto com defeito`;
+  }
+
+  const art = artigo_embarcador(emb);
+  return `Olá, *${nome}*!\n\nSou ${assistente}, representante da Transportadora J&T Express, parceira de entregas ${art} *${emb}*\nVerificamos que você abriu uma reclamação referente ao pedido *${rem}*\n\nPara que possamos auxiliar, escolha uma opção:\n\n1️⃣ Recebi o produto\n2️⃣ Não recebi o produto\n3️⃣ Recebi o pacote com produtos faltantes\n4️⃣ Recebi o produto com defeito\n5️⃣ Recebi um produto diferente do comprado\n6️⃣ Recebi o produto danificado`;
+}
+
+function gerarTemplateFeishu(row, assistente, lider, presencial) {
+  const tel = presencial ? 'Apenas presencial' : (row.tel || 'N/A');
+  return [
+    `${row.problema} - ${row.base}`,
+    `Nº: ${row.remessa}`,
+    `EMBARCADOR: ${row.embarcador}`,
+    `DATA DA BAIXA: ${row.dataBaixa}`,
+    `ENTREGADOR: ${row.entregador}`,
+    `VENCIMENTO: ${row.vencimento}`,
+    `TEL: ${tel}`,
+    `Atendente responsável: ${assistente}`,
+    ``,
+    `@${lider || 'Líder'}`
+  ].join('\n');
+}
+
+// ─── AÇÕES DOS BOTÕES ────────────────────────────────────────────
+
+function copiarFeishu(idx) {
+  const row = dadosGlobal[idx];
+  if (!row) return;
+  const assistente = document.getElementById('assistente-input').value.trim() || 'Atendente';
+  const lider      = lideresMemoria[row.base] || 'Líder';
+  const presencial = isNumeroInvalido(row.tel) || !!presencialMemoria[row.remessa];
+  const texto      = gerarTemplateFeishu(row, assistente, lider, presencial);
+  const btn        = document.getElementById('btn-copy-' + idx);
+
+  const fazer = () => {
+    showToast('Template copiado!');
+    if (btn) {
+      btn.classList.add('btn-copied');
+      btn.innerHTML = '<i class="ti ti-check"></i> Copiado!';
+      setTimeout(() => {
+        btn.classList.remove('btn-copied');
+        btn.innerHTML = '<i class="ti ti-copy"></i> Copiar template Feishu';
+      }, 2000);
+    }
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(fazer).catch(() => fallbackCopy(texto, fazer));
+  } else {
+    fallbackCopy(texto, fazer);
+  }
+}
+
+function fallbackCopy(texto, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = texto;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  cb();
+}
+
+function salvarLider(base, nome) { lideresMemoria[base] = nome; }
+
+function togglePresencial(idx, checked) {
+  const row = dadosGlobal[idx];
+  if (!row) return;
+  presencialMemoria[row.remessa] = checked;
+
+  const invalido   = isNumeroInvalido(row.tel);
+  const presencial = invalido || checked;
+  const assistente = document.getElementById('assistente-input').value.trim() || 'Atendente';
+
+  document.getElementById('card-' + idx)?.classList.toggle('presencial', presencial);
+
+  const badgeEl = document.getElementById('badge-tipo-' + idx);
+  if (badgeEl) {
+    badgeEl.className = 'badge ' + (presencial ? 'badge-red' : 'badge-blue');
+    badgeEl.textContent = presencial ? 'Presencial' : 'WhatsApp';
+  }
+
+  const wppZone = document.getElementById('wpp-zone-' + idx);
+  if (wppZone) {
+    wppZone.innerHTML = gerarBotoesWpp(row, presencial, assistente);
+  }
+
+  atualizarStats();
+}
+
+// Gera os botões de WhatsApp (Web + App) ou botão de sem número
+function gerarBotoesWpp(row, presencial, assistente) {
+  if (presencial) {
+    return `<button class="btn btn-red" disabled><i class="ti ti-phone-off"></i> Sem número</button>`;
+  }
+  const t    = String(row.tel).replace(/\D/g, '');
+  const full = t.startsWith('55') ? t : '55' + t;
+  const msg  = encodeURIComponent(gerarMensagemWpp(row, assistente));
+  const linkWeb = `https://web.whatsapp.com/send?phone=${full}&text=${msg}`;
+  const linkApp = `https://wa.me/${full}?text=${msg}`;
+  return `
+    <a class="btn btn-green" href="${linkWeb}" target="_blank"><i class="ti ti-brand-whatsapp"></i> WhatsApp Web</a>
+    <a class="btn btn-green" href="${linkApp}" target="_blank"><i class="ti ti-brand-whatsapp"></i> WhatsApp App</a>`;
+}
+
+function trocarPlanilha() {
+  dadosGlobal = [];
+  Object.keys(presencialMemoria).forEach(k => delete presencialMemoria[k]);
+  document.getElementById('filter-base').innerHTML     = '<option value="">Todas as bases</option>';
+  document.getElementById('filter-problema').innerHTML = '<option value="">Todos os tipos</option>';
+  document.getElementById('filter-search').value       = '';
+  document.getElementById('upload-area').style.display = 'block';
+  document.getElementById('stats').style.display       = 'none';
+  document.getElementById('filter-bar').style.display  = 'none';
+  document.getElementById('info-bar').style.display    = 'none';
+  document.getElementById('cards-container').innerHTML = '';
+  recriarInputArquivo().click();
+}
+
+// ─── ESTATÍSTICAS ─────────────────────────────────────────────────
+
+function atualizarStats() {
+  const pres = dadosGlobal.filter(r => isNumeroInvalido(r.tel) || !!presencialMemoria[r.remessa]).length;
+  document.getElementById('st-total').textContent = dadosGlobal.length;
+  document.getElementById('st-wp').textContent    = dadosGlobal.length - pres;
+  document.getElementById('st-pres').textContent  = pres;
+}
+
+// ─── RENDERIZAÇÃO DOS CARDS ───────────────────────────────────────
+
+function finalizarCarregamento(abaNome, raw, ignorados) {
+  document.getElementById('info-bar').style.display = 'flex';
+  document.getElementById('info-bar').innerHTML =
+    `<span>Aba: <b>${abaNome}</b> &bull; Linhas: <b>${raw.length}</b> &bull; Acareações: <b>${dadosGlobal.length}</b> &bull; Ignorados: <b>${ignorados}</b></span>
+     <button class="btn btn-sm" onclick="trocarPlanilha()"><i class="ti ti-refresh"></i> Trocar planilha</button>`;
+
+  if (!dadosGlobal.length) { alert('Nenhuma acareação válida encontrada.'); return; }
+
+  document.getElementById('upload-area').style.display = 'none';
+  document.getElementById('stats').style.display       = 'flex';
+  document.getElementById('filter-bar').style.display  = 'flex';
+
+  const bases     = [...new Set(dadosGlobal.map(r => r.base))].sort();
+  const problemas = [...new Set(dadosGlobal.map(r => r.problema))].sort();
+  const selBase   = document.getElementById('filter-base');
+  const selProb   = document.getElementById('filter-problema');
+  selBase.innerHTML = '<option value="">Todas as bases</option>';
+  selProb.innerHTML = '<option value="">Todos os tipos</option>';
+  bases.forEach(b     => { const o = document.createElement('option'); o.value=b; o.textContent=b; selBase.appendChild(o); });
+  problemas.forEach(p => { const o = document.createElement('option'); o.value=p; o.textContent=p; selProb.appendChild(o); });
+
+  renderCards();
+}
+
+function renderCards() {
+  const container      = document.getElementById('cards-container');
+  const filtroBase     = document.getElementById('filter-base').value;
+  const filtroProblema = document.getElementById('filter-problema').value;
+  const filtroSearch   = document.getElementById('filter-search').value.toLowerCase();
+  const assistente     = document.getElementById('assistente-input').value.trim() || 'Atendente';
+
+  const filtrados = dadosGlobal
+    .map((row, idx) => ({ row, idx }))
+    .filter(({ row }) => {
+      if (filtroBase     && row.base     !== filtroBase)     return false;
+      if (filtroProblema && row.problema !== filtroProblema) return false;
+      if (filtroSearch   && !row.remessa.includes(filtroSearch)) return false;
+      return true;
+    });
+
+  atualizarStats();
+
+  if (!filtrados.length) {
+    container.innerHTML = '<div class="empty"><i class="ti ti-inbox" style="font-size:36px;display:block;margin-bottom:8px;"></i>Nenhuma acareação encontrada</div>';
+    return;
+  }
+
+  container.innerHTML = filtrados.map(({ row, idx }) => {
+    const invalido   = isNumeroInvalido(row.tel);
+    const presencial = invalido || !!presencialMemoria[row.remessa];
+    const lider      = lideresMemoria[row.base] || '';
+
+    const wppHTML = gerarBotoesWpp(row, presencial, assistente);
+
+    return `
+    <div class="card ${presencial ? 'presencial' : ''}" id="card-${idx}">
+      <div class="card-top">
+        <div>
+          <div class="card-title">${row.remessa} &mdash; ${row.embarcador}</div>
+          <div class="card-subtitle">${row.base} &bull; ${row.rne} &bull; ${row.destinatario}</div>
+        </div>
+        <div class="badges">
+          <span class="badge ${presencial ? 'badge-red' : 'badge-blue'}" id="badge-tipo-${idx}">${presencial ? 'Presencial' : 'WhatsApp'}</span>
+          <span class="badge badge-amber">${row.problema}</span>
+        </div>
+      </div>
+      <div class="card-grid">
+        <div class="field"><div class="field-label">Data da baixa</div><div class="field-value">${row.dataBaixa}</div></div>
+        <div class="field"><div class="field-label">Vencimento</div><div class="field-value">${row.vencimento}</div></div>
+        <div class="field"><div class="field-label">Entregador</div><div class="field-value">${row.entregador}</div></div>
+        <div class="field"><div class="field-label">Telefone</div><div class="field-value">${invalido ? 'Sem número' : row.tel}</div></div>
+      </div>
+      <div class="card-actions">
+        <div id="wpp-zone-${idx}">${wppHTML}</div>
+        <button class="btn btn-blue" id="btn-copy-${idx}" onclick="copiarFeishu(${idx})">
+          <i class="ti ti-copy"></i> Copiar template Feishu
+        </button>
+        <span style="font-size:12px;color:#aaa;">@ Líder:</span>
+        <input class="lider-input" type="text" placeholder="Nome do líder" value="${lider}" oninput="salvarLider(${JSON.stringify(row.base)}, this.value)">
+        ${!invalido ? `
+        <label class="toggle-label">
+          <input type="checkbox" ${presencialMemoria[row.remessa] ? 'checked' : ''} onchange="togglePresencial(${idx}, this.checked)">
+          Presencial
+        </label>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── LEITURA DO ARQUIVO ───────────────────────────────────────────
+
+function recriarInputArquivo() {
+  const old = document.getElementById('file-input');
+  const novo = document.createElement('input');
+  novo.type = 'file';
+  novo.id = 'file-input';
+  novo.accept = '.xlsx,.xls';
+  novo.style.display = 'none';
+  novo.addEventListener('change', handleFileChange);
+  old.replaceWith(novo);
+  return novo;
+}
+
+function handleFileChange(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const wb      = XLSX.read(ev.target.result, { type: 'array', cellDates: false });
+      const abaNome = encontrarAba(wb);
+      const raw     = XLSX.utils.sheet_to_json(wb.Sheets[abaNome], { defval: '', raw: true });
+      if (!raw.length) { alert('Planilha vazia.'); return; }
+
+      const cols = Object.keys(raw[0]);
+      const sig  = assinatura(cols);
+
+      // Tenta mapeamento salvo primeiro
+      const mapaSalvo = carregarMapeamento(sig);
+      const foiSalvo  = !!mapaSalvo;
+
+      // Detecta automaticamente o que conseguir
+      const mapaAuto = {};
+      CAMPOS.forEach(campo => {
+        mapaAuto[campo.id] = detectarColuna(cols, campo.candidatos);
+      });
+
+      // Se tiver mapeamento salvo, usa ele como base; senão usa o automático
+      const mapaInicial = mapaSalvo || mapaAuto;
+
+      // Sempre mostra o modal para o usuário confirmar
+      abrirModalMapeamento(cols, mapaInicial, foiSalvo, (mapaConfirmado) => {
+        const { dados, ignorados } = processarDados(raw, mapaConfirmado);
+        dadosGlobal = dados;
+        finalizarCarregamento(abaNome, raw, ignorados);
+      });
+
+    } catch(err) {
+      alert('Erro ao ler o arquivo: ' + err.message);
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+};
+
+document.getElementById('file-input').addEventListener('change', handleFileChange);
+document.getElementById('filter-base').addEventListener('change', renderCards);
+document.getElementById('filter-problema').addEventListener('change', renderCards);
+document.getElementById('filter-search').addEventListener('input', renderCards);
+document.getElementById('assistente-input').addEventListener('input', () => { if (dadosGlobal.length) renderCards(); });
+</script>
+</body>
+</html>
