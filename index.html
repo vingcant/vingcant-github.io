@@ -7,27 +7,53 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
+  :root {
+    --bg: #f5f5f5;
+    --bg-card: #fff;
+    --bg-card2: #fafafa;
+    --border: #e5e5e5;
+    --text: #1a1a1a;
+    --text-muted: #555;
+    --text-hint: #999;
+    --input-bg: #fff;
+    --info-bg: #f0f4ff;
+    --info-border: #c7d4f5;
+    --info-text: #444;
+  }
+  [data-theme="dark"] {
+    --bg: #111;
+    --bg-card: #1e1e1e;
+    --bg-card2: #252525;
+    --border: #333;
+    --text: #eee;
+    --text-muted: #aaa;
+    --text-hint: #666;
+    --input-bg: #252525;
+    --info-bg: #1a1f2e;
+    --info-border: #2d3a5e;
+    --info-text: #bbb;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 1.5rem; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 1.5rem; transition: background 0.2s, color 0.2s; }
   .container { max-width: 960px; margin: 0 auto; }
-  h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.5rem; color: #111; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.5rem; color: var(--text); }
   .stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
-  .stat { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 8px 16px; font-size: 13px; color: #555; }
-  .stat span { font-weight: 600; color: #111; }
-  .upload-area { border: 2px dashed #ccc; border-radius: 12px; padding: 3rem; text-align: center; color: #888; font-size: 14px; margin-bottom: 1.5rem; cursor: pointer; transition: background 0.15s; background: #fff; }
-  .upload-area:hover { background: #fafafa; border-color: #aaa; }
-  .upload-area i { font-size: 36px; display: block; margin-bottom: 10px; color: #bbb; }
-  .assistente-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px 16px; flex-wrap: wrap; }
-  .assistente-bar label { font-size: 13px; color: #555; white-space: nowrap; }
-  .assistente-bar input { font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid #ddd; color: #111; width: 200px; font-family: inherit; }
+  .stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 13px; color: var(--text-muted); }
+  .stat span { font-weight: 600; color: var(--text); }
+  .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 3rem; text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 1.5rem; cursor: pointer; transition: background 0.15s; background: var(--bg-card); }
+  .upload-area:hover { background: var(--bg-card2); }
+  .upload-area i { font-size: 36px; display: block; margin-bottom: 10px; color: var(--text-hint); }
+  .assistente-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; flex-wrap: wrap; }
+  .assistente-bar label { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+  .assistente-bar input { font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border); color: var(--text); background: var(--input-bg); width: 200px; font-family: inherit; }
   .filter-bar { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
-  .filter-bar select, .filter-bar input[type=text] { font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #111; font-family: inherit; }
-  .info-bar { background: #f0f4ff; border: 1px solid #c7d4f5; border-radius: 8px; padding: 8px 14px; font-size: 12px; color: #444; margin-bottom: 1rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+  .filter-bar select, .filter-bar input[type=text] { font-size: 13px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-family: inherit; }
+  .info-bar { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: 8px; padding: 8px 14px; font-size: 12px; color: var(--info-text); margin-bottom: 1rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 10px; }
   .card.presencial { border-left: 4px solid #E24B4A; }
   .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-  .card-title { font-size: 14px; font-weight: 600; color: #111; }
-  .card-subtitle { font-size: 12px; color: #777; margin-top: 2px; }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .card-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   .badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
   .badge { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; }
   .badge-red { background: #FCEBEB; color: #A32D2D; }
@@ -35,48 +61,68 @@
   .badge-amber { background: #FAEEDA; color: #854F0B; }
   .badge-green { background: #E1F5EE; color: #0F6E56; }
   .badge-gray { background: #F0F0F0; color: #888; }
+  [data-theme="dark"] .badge-red { background: #3a1515; color: #f09595; }
+  [data-theme="dark"] .badge-blue { background: #0c2340; color: #85b7eb; }
+  [data-theme="dark"] .badge-amber { background: #2e1f05; color: #fac775; }
+  [data-theme="dark"] .badge-green { background: #0a2010; color: #5dcaa5; }
+  [data-theme="dark"] .badge-gray { background: #2a2a2a; color: #888; }
   .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 16px; margin-bottom: 14px; }
   .field { font-size: 12px; }
-  .field-label { color: #999; margin-bottom: 2px; }
-  .field-value { color: #111; font-weight: 500; word-break: break-word; }
+  .field-label { color: var(--text-hint); margin-bottom: 2px; }
+  .field-value { color: var(--text); font-weight: 500; word-break: break-word; }
   .card-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 6px 13px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #333; cursor: pointer; text-decoration: none; transition: background 0.15s; font-family: inherit; }
-  .btn:hover { background: #f5f5f5; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 6px 13px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; text-decoration: none; transition: background 0.15s; font-family: inherit; }
+  .btn:hover { background: var(--bg-card2); }
   .btn-green { border-color: #1D9E75; color: #0F6E56; }
   .btn-green:hover { background: #E1F5EE; }
+  [data-theme="dark"] .btn-green:hover { background: #0a2010; }
   .btn-blue { border-color: #378ADD; color: #185FA5; }
   .btn-blue:hover { background: #E6F1FB; }
+  [data-theme="dark"] .btn-blue { color: #85b7eb; border-color: #185FA5; }
+  [data-theme="dark"] .btn-blue:hover { background: #0c2340; }
   .btn-copied { border-color: #1D9E75; color: #0F6E56; background: #E1F5EE; }
+  [data-theme="dark"] .btn-copied { background: #0a2010; }
   .btn-red { border-color: #D85A30; color: #993C1D; opacity: 0.6; cursor: not-allowed; }
   .btn-sm { padding: 3px 10px; font-size: 11px; }
-  .lider-input { font-size: 12px; padding: 5px 9px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; color: #111; width: 140px; font-family: inherit; }
-  .toggle-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; cursor: pointer; user-select: none; }
-  .empty { text-align: center; color: #bbb; padding: 3rem 1rem; font-size: 14px; }
+  .lider-input { font-size: 12px; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card2); color: var(--text); width: 140px; font-family: inherit; }
+  .toggle-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; }
+  .empty { text-align: center; color: var(--text-hint); padding: 3rem 1rem; font-size: 14px; }
   .toast { position: fixed; bottom: 24px; right: 24px; background: #1D9E75; color: white; padding: 11px 18px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
   .toast.show { opacity: 1; }
 
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-  .modal { background: #fff; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-  .modal h2 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-  .modal .modal-sub { font-size: 12px; color: #888; margin-bottom: 1.25rem; }
+  .theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 500; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 7px 13px; font-size: 12px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; transition: background 0.15s; }
+  .theme-toggle:hover { background: var(--bg-card2); }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .modal { background: var(--bg-card); border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .modal h2 { font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+  .modal .modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 1.25rem; }
   .modal-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .modal-row label { font-size: 13px; color: #444; width: 170px; flex-shrink: 0; }
+  .modal-row label { font-size: 13px; color: var(--info-text); width: 170px; flex-shrink: 0; }
   .modal-row label span.req { color: #E24B4A; margin-left: 2px; }
-  .modal-row select { flex: 1; font-size: 13px; padding: 5px 8px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #111; font-family: inherit; }
+  .modal-row select { flex: 1; font-size: 13px; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text); font-family: inherit; }
   .modal-row select.auto { border-color: #1D9E75; background: #f4fdf9; }
+  [data-theme="dark"] .modal-row select.auto { background: #0a2010; }
   .modal-row select.missing { border-color: #E24B4A; background: #fff8f8; }
-  .modal-legend { display: flex; gap: 12px; font-size: 11px; color: #888; margin-bottom: 1rem; flex-wrap: wrap; }
+  [data-theme="dark"] .modal-row select.missing { background: #2a0a0a; }
+  .modal-legend { display: flex; gap: 12px; font-size: 11px; color: var(--text-muted); margin-bottom: 1rem; flex-wrap: wrap; }
   .modal-legend span { display: flex; align-items: center; gap: 4px; }
   .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
   .dot-green { background: #1D9E75; }
   .dot-red { background: #E24B4A; }
   .dot-gray { background: #ccc; }
-  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #eee; }
+  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border); }
   .modal-saved-notice { background: #E1F5EE; border: 1px solid #1D9E75; border-radius: 6px; padding: 6px 10px; font-size: 12px; color: #0F6E56; margin-bottom: 1rem; display: none; }
+  [data-theme="dark"] .modal-saved-notice { background: #0a2010; color: #5dcaa5; border-color: #0F6E56; }
 </style>
 </head>
 <body>
 <div class="container">
+
+<button class="theme-toggle" id="theme-toggle" onclick="alternarTema()" title="Alternar tema">
+  <i class="ti ti-moon" id="theme-icon"></i>
+  <span id="theme-label">Modo escuro</span>
+</button>
 
 <h1>Painel de Acareações — J&T Express</h1>
 
@@ -88,7 +134,7 @@
 <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
   <i class="ti ti-file-spreadsheet"></i>
   Clique para carregar o Excel do BI
-  <div style="font-size:12px;margin-top:8px;color:#bbb;">Arquivo .xlsx exportado do BI</div>
+  <div style="font-size:12px;margin-top:8px;color:var(--text-hint);">Arquivo .xlsx exportado do BI</div>
   <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none">
 </div>
 
@@ -101,7 +147,7 @@
 </div>
 
 <div class="filter-bar" id="filter-bar" style="display:none">
-  <i class="ti ti-filter" style="color:#bbb;font-size:16px;"></i>
+  <i class="ti ti-filter" style="color:var(--text-hint);font-size:16px;"></i>
   <select id="filter-base"><option value="">Todas as bases</option></select>
   <select id="filter-problema"><option value="">Todos os tipos</option></select>
   <input type="text" id="filter-search" placeholder="Buscar remessa..." style="width:170px;">
@@ -113,7 +159,28 @@
 
 </div>
 <script>
- 
+
+function alternarTema() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const novoTema = isDark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', novoTema);
+  localStorage.setItem('tema', novoTema);
+  document.getElementById('theme-icon').className = isDark ? 'ti ti-moon' : 'ti ti-sun';
+  document.getElementById('theme-label').textContent = isDark ? 'Modo escuro' : 'Modo claro';
+}
+(function() {
+  const salvo = localStorage.getItem('tema') || 'light';
+  if (salvo === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.addEventListener('DOMContentLoaded', () => {
+      const ic = document.getElementById('theme-icon');
+      const lb = document.getElementById('theme-label');
+      if (ic) ic.className = 'ti ti-sun';
+      if (lb) lb.textContent = 'Modo claro';
+    });
+  }
+})();
+
 const lideresMemoria = {};
 const presencialMemoria = {};
 let dadosGlobal = [];
@@ -128,7 +195,6 @@ const MAPA_PROBLEMAS = [
   { chaves: ['pacote perdido'],                                                    saida: 'Pacote Perdido'        },
   { chaves: ['troca de etiqueta', 'troca'],                                        saida: 'Troca de etiqueta'     },
 ];
-
 
 const CAMPOS = [
   { id: 'remessa',      label: 'Remessa / Nº do pedido',        obrigatorio: true,  candidatos: ['remessa', 'numero do pedido', 'pedido'] },
@@ -179,13 +245,11 @@ function encontrarAba(wb) {
 }
 
 function detectarColuna(cols, candidatos) {
-
- for (const c of candidatos) {
+  for (const c of candidatos) {
     const cl = strip(c);
     for (const col of cols) if (strip(col) === cl) return col;
   }
-
- for (const c of candidatos) {
+  for (const c of candidatos) {
     const cl = strip(c);
     for (const col of cols) if (strip(col).includes(cl)) return col;
   }
@@ -202,7 +266,7 @@ function tratarNumero(v) {
 
 function normalizar_embarcador(v) {
   const s = String(v || '').toLowerCase().trim();
-  const mapa = { shein:'Shein', cainiao:'Cainiao', mercado:'Mercado Livre', shopee:'Shopee', temu:'Temu', wepink:'WePink', jequiti:'Jequiti' };
+  const mapa = { shein:'Shein', cainiao:'Cainiao', mercado:'Mercado Livre', shopee:'Shopee', temu:'Temu', wepink:'WePink', jequiti:'Jequiti', tiktok:'TikTok' };
   for (const k in mapa) if (s.includes(k)) return mapa[k];
   return s.replace(/\b\w/g, c => c.toUpperCase());
 }
@@ -220,6 +284,28 @@ function formatarDataExcel(v) {
   return (hora === 0 && min === 0) ? data : `${data} às ${pad(hora)}h${pad(min)}`;
 }
 
+function ajustarVencimento(v) {
+  if (v === null || v === undefined || String(v).trim() === '' || String(v) === 'NaN') return 'N/A';
+  let d;
+  if (typeof v === 'number') d = new Date(Math.round((v - 25569) * 86400 * 1000));
+  else if (v instanceof Date) d = v;
+  else d = new Date(v);
+  if (isNaN(d)) return String(v).trim() || 'N/A';
+  const hora = d.getUTCHours();
+  const pad  = n => String(n).padStart(2, '0');
+  if (hora >= 17) {
+    const data = `${pad(d.getUTCDate())}/${pad(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`;
+    return `${data} às 17h00`;
+  }
+  if (hora < 8) {
+    const anterior = new Date(d.getTime() - 86400000);
+    const data = `${pad(anterior.getUTCDate())}/${pad(anterior.getUTCMonth()+1)}/${anterior.getUTCFullYear()}`;
+    return `${data} às 17h00`;
+  }
+  const data = `${pad(d.getUTCDate())}/${pad(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`;
+  return `${data} às ${pad(hora)}h${pad(d.getUTCMinutes())}`;
+}
+
 function isNumeroInvalido(tel) {
   const t = String(tel || '').replace(/\D/g, '');
   return !t || t === '0' || t === '00' || t.length < 8;
@@ -228,13 +314,12 @@ function isNumeroInvalido(tel) {
 function artigo_embarcador(nome) {
   const n = String(nome).toLowerCase();
   if (['mercado', 'mercado livre', 'magalu'].some(m => n.includes(m))) return 'do';
-  if (['cainiao', 'shein',''].some(m => n.includes(m))) return 'da';
+  if (['cainiao', 'shein'].some(m => n.includes(m))) return 'da';
   if (['wepink'].some(m => n.includes(m))) return 'na';
   if (['tiktok'].some(m => n.includes(m))) return 'no';
   if (nome.match(/[aei]$/i)) return 'da';
   return 'do';
 }
-
 
 
 function assinatura(cols) {
@@ -265,13 +350,9 @@ function limparMapeamentos() {
 function abrirModalMapeamento(cols, mapeamentoAtual, foiSalvo, onConfirm) {
   const mc = document.getElementById('modal-container');
 
-  const opts = `<option value="">— não usar —</option>` +
-    cols.map(c => `<option value="${c.replace(/"/g,'&quot;')}">${c}</option>`).join('');
-
   const linhas = CAMPOS.map(campo => {
     const colAtual = mapeamentoAtual[campo.id] || '';
-    const autoDetectado = !!colAtual;
-    const cls = autoDetectado ? 'auto' : (campo.obrigatorio ? 'missing' : '');
+    const cls = colAtual ? 'auto' : (campo.obrigatorio ? 'missing' : '');
     return `
     <div class="modal-row">
       <label>${campo.label}${campo.obrigatorio ? '<span class="req">*</span>' : ''}</label>
@@ -287,9 +368,9 @@ function abrirModalMapeamento(cols, mapeamentoAtual, foiSalvo, onConfirm) {
     <div class="modal">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
         <h2><i class="ti ti-table-options"></i> Confirme as colunas da planilha</h2>
-        <button class="btn btn-sm" onclick="fecharModal()" title="Fechar (ESC)" style="border:none;background:none;font-size:18px;color:#aaa;padding:2px 6px;cursor:pointer;">&#x2715;</button>
+        <button onclick="fecharModal()" title="Fechar (ESC)" style="border:none;background:none;font-size:18px;color:var(--text-hint);padding:2px 6px;cursor:pointer;">&#x2715;</button>
       </div>
-      <p class="modal-sub">Verifique se cada campo foi associado à coluna correta. Este mapeamento será salvo automaticamente para esta planilha.</p>
+      <p class="modal-sub">Verifique se cada campo foi associado à coluna correta. Este mapeamento será salvo automaticamente.</p>
       <div class="modal-saved-notice" id="modal-saved-notice">
         <i class="ti ti-check"></i> Mapeamento salvo anteriormente — verifique se ainda está correto.
       </div>
@@ -300,19 +381,13 @@ function abrirModalMapeamento(cols, mapeamentoAtual, foiSalvo, onConfirm) {
       </div>
       ${linhas}
       <div class="modal-footer">
-        <button class="btn btn-sm" onclick="limparMapeamentos()">
-          <i class="ti ti-trash"></i> Limpar mapeamentos salvos
-        </button>
-        <button class="btn btn-blue btn-sm" id="btn-confirmar-mapa">
-          <i class="ti ti-check"></i> Confirmar e carregar
-        </button>
+        <button class="btn btn-sm" onclick="limparMapeamentos()"><i class="ti ti-trash"></i> Limpar mapeamentos salvos</button>
+        <button class="btn btn-blue btn-sm" id="btn-confirmar-mapa"><i class="ti ti-check"></i> Confirmar e carregar</button>
       </div>
     </div>
   </div>`;
 
-  if (foiSalvo) {
-    document.getElementById('modal-saved-notice').style.display = 'block';
-  }
+  if (foiSalvo) document.getElementById('modal-saved-notice').style.display = 'block';
 
   CAMPOS.forEach(campo => {
     const sel = document.getElementById('map-' + campo.id);
@@ -321,13 +396,13 @@ function abrirModalMapeamento(cols, mapeamentoAtual, foiSalvo, onConfirm) {
     });
   });
 
-  document.getElementById('btn-confirmar-mapa').addEventListener('click', () => confirmarMapeamento());
+  document.getElementById('btn-confirmar-mapa').addEventListener('click', confirmarMapeamento);
 
   document.querySelector('#modal-container .modal-overlay').addEventListener('click', function(e) {
     if (e.target === this) fecharModal();
   });
 
-  window._colsParaMapeamento = cols;
+  window._colsParaMapeamento  = cols;
   window._onConfirmMapeamento = onConfirm;
 }
 
@@ -338,7 +413,7 @@ function fecharModal() {
 function confirmarMapeamento() {
   const cols = window._colsParaMapeamento;
   const mapa = {};
-  let faltando = [];
+  const faltando = [];
 
   CAMPOS.forEach(campo => {
     const sel = document.getElementById('map-' + campo.id);
@@ -348,22 +423,17 @@ function confirmarMapeamento() {
   });
 
   if (faltando.length) {
-    alert('Os seguintes campos obrigatórios não foram mapeados:\n• ' + faltando.join('\n• '));
+    alert('Campos obrigatórios não mapeados:\n• ' + faltando.join('\n• '));
     return;
   }
 
-  const sig = assinatura(cols);
-  salvarMapeamento(sig, mapa);
-
+  salvarMapeamento(assinatura(cols), mapa);
   fecharModal();
-
   if (window._onConfirmMapeamento) window._onConfirmMapeamento(mapa);
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && document.getElementById('modal-container').innerHTML) {
-    fecharModal();
-  }
+  if (e.key === 'Escape' && document.getElementById('modal-container').innerHTML) fecharModal();
 });
 
 
@@ -374,16 +444,16 @@ function processarDados(raw, mapa) {
     if (!prob) { ignorados++; return null; }
     const base = mapa.base ? String(r[mapa.base] || '').toUpperCase().trim() : 'N/A';
     return {
-      remessa:      mapa.remessa      ? tratarNumero(r[mapa.remessa])                          : '',
-      tel:          mapa.tel          ? String(r[mapa.tel]          || '').trim()              : '',
-      entregador:   mapa.entregador   ? String(r[mapa.entregador]   || 'N/A').trim()           : 'N/A',
-      dataBaixa:    mapa.dataBaixa    ? formatarDataExcel(r[mapa.dataBaixa])                   : 'N/A',
-      vencimento:   mapa.prazo        ? formatarDataExcel(r[mapa.prazo])                       : 'N/A',
+      remessa:      mapa.remessa      ? tratarNumero(r[mapa.remessa])                        : '',
+      tel:          mapa.tel          ? String(r[mapa.tel]          || '').trim()            : '',
+      entregador:   mapa.entregador   ? String(r[mapa.entregador]   || 'N/A').trim()         : 'N/A',
+      dataBaixa:    mapa.dataBaixa    ? formatarDataExcel(r[mapa.dataBaixa])                 : 'N/A',
+      vencimento:   mapa.prazo        ? ajustarVencimento(r[mapa.prazo])                     : 'N/A',
       base,
-      embarcador:   mapa.embarcador   ? normalizar_embarcador(r[mapa.embarcador])              : 'N/A',
+      embarcador:   mapa.embarcador   ? normalizar_embarcador(r[mapa.embarcador])            : 'N/A',
       problema:     prob,
-      destinatario: mapa.destinatario ? String(r[mapa.destinatario] || 'Cliente').trim()       : 'Cliente',
-      rne:          mapa.rne          ? String(r[mapa.rne]          || '').trim()              : '',
+      destinatario: mapa.destinatario ? String(r[mapa.destinatario] || 'Cliente').trim()     : 'Cliente',
+      rne:          mapa.rne          ? String(r[mapa.rne]          || '').trim()            : '',
     };
   }).filter(Boolean);
   return { dados, ignorados };
@@ -399,22 +469,20 @@ function gerarMensagemWpp(row, assistente) {
   if (emb.toLowerCase().includes('mercado')) {
     return `Olá, *${nome}*!\n\nMe chamo ${assistente} e sou da Transportadora J&T Express, parceira de entregas do *Mercado Livre*.\n\nVerificamos que você abriu uma reclamação referente ao produto *N/A*, ID *${rem}* e entregue dia *${data}*.\n\nPara que possamos auxiliar, escolha uma opção:\n\n1 - Recebi o produto\n2 - Não recebi o produto\n3 - Recebi o pacote com produtos faltantes\n4 - Recebi o produto com defeito\n5 - Recebi um produto diferente do comprado`;
   }
-
   if (emb.toLowerCase().includes('tiktok')) {
-    return `Olá, *${nome}*!\n\nMeu nome é ${assistente}, representante da transportadora J&T Express.\n\nVerificamos que você abriu uma reclamação referente ao pedido *${rem}*, realizado na *${emb}*.\n\nPara que possamos auxiliar, escolha uma das opções abaixo e responda apenas com o n°:\n\n1 - Recebi o produto.\n2 - Recebi o produto, corretamente lacrado e embalado.\n3 - Não recebi o produto\n4 - Recebi o produto com itens faltantes\n5 - Recebi o produto, porém com a embalagem externa em más condições.\n6 - Recebi o produto diferente do que comprei\n7 - Recebi o produto com defeito`;
+    return `Olá, *${nome}*!\n\nMeu nome é ${assistente}, representante da transportadora J&T Express.\n\nVerificamos que você abriu uma reclamação referente ao pedido *${rem}*, realizado no *${emb}*.\n\nPara que possamos auxiliar, escolha uma das opções abaixo e responda apenas com o n°:\n\n1 - Recebi o produto.\n2 - Recebi o produto, corretamente lacrado e embalado.\n3 - Não recebi o produto\n4 - Recebi o produto com itens faltantes\n5 - Recebi o produto, porém com a embalagem externa em más condições.\n6 - Recebi o produto diferente do que comprei\n7 - Recebi o produto com defeito`;
   }
-
   if (emb.toLowerCase().includes('wepink')) {
     return `Olá, *${nome}*!\n\nMeu nome é ${assistente}, representante da transportadora J&T Express.\n\nVerificamos que você abriu uma reclamação referente ao pedido *${rem}*, realizado na *${emb}*.\n\nPara que possamos auxiliar, escolha uma das opções abaixo e responda apenas com o n°:\n\n1 - Recebi o produto.\n2 - Recebi o produto, corretamente lacrado e embalado.\n3 - Não recebi o produto\n4 - Recebi o produto com itens faltantes\n5 - Recebi o produto, porém com a embalagem externa em más condições.\n6 - Recebi o produto diferente do que comprei\n7 - Recebi o produto com defeito`;
   }
-
   const art = artigo_embarcador(emb);
   return `Olá, *${nome}*!\n\nSou ${assistente}, representante da Transportadora J&T Express, parceira de entregas ${art} *${emb}*\nVerificamos que você abriu uma reclamação referente ao pedido *${rem}*\n\nPara que possamos auxiliar, escolha uma opção:\n\n1️⃣ Recebi o produto\n2️⃣ Não recebi o produto\n3️⃣ Recebi o pacote com produtos faltantes\n4️⃣ Recebi o produto com defeito\n5️⃣ Recebi um produto diferente do comprado\n6️⃣ Recebi o produto danificado`;
 }
 
 function gerarTemplateFeishu(row, assistente, lider, presencial) {
-  const tel = presencial ? 'Apenas presencial' : (row.tel || 'N/A');
-  return [
+  const tel   = presencial ? 'Apenas presencial' : (row.tel || 'N/A');
+  const linhas = [
+    ``,
     `${row.problema} - ${row.base}`,
     `Nº: ${row.remessa}`,
     `EMBARCADOR: ${row.embarcador}`,
@@ -423,17 +491,21 @@ function gerarTemplateFeishu(row, assistente, lider, presencial) {
     `VENCIMENTO: ${row.vencimento}`,
     `TEL: ${tel}`,
     `Atendente responsável: ${assistente}`,
-    ``,
-    `@${lider || 'Líder'}`
-  ].join('\n');
+  ];
+  if (lider && lider.trim()) {
+    linhas.push(``);
+    linhas.push(`@${lider.trim()}`);
+  }
+  return linhas.join('\n');
 }
 
 
 function copiarFeishu(idx) {
-  const row = dadosGlobal[idx];
+  const row        = dadosGlobal[idx];
   if (!row) return;
   const assistente = document.getElementById('assistente-input').value.trim() || 'Atendente';
-  const lider      = lideresMemoria[row.base] || 'Líder';
+  const inputLider = document.getElementById('lider-input-' + idx);
+  const lider      = inputLider ? inputLider.value.trim() : (lideresMemoria[row.base] || '');
   const presencial = isNumeroInvalido(row.tel) || !!presencialMemoria[row.remessa];
   const texto      = gerarTemplateFeishu(row, assistente, lider, presencial);
   const btn        = document.getElementById('btn-copy-' + idx);
@@ -468,7 +540,9 @@ function fallbackCopy(texto, cb) {
   cb();
 }
 
-function salvarLider(base, nome) { lideresMemoria[base] = nome; }
+function salvarLider(base, nome) {
+  lideresMemoria[base] = nome;
+}
 
 function togglePresencial(idx, checked) {
   const row = dadosGlobal[idx];
@@ -483,14 +557,12 @@ function togglePresencial(idx, checked) {
 
   const badgeEl = document.getElementById('badge-tipo-' + idx);
   if (badgeEl) {
-    badgeEl.className = 'badge ' + (presencial ? 'badge-red' : 'badge-blue');
+    badgeEl.className   = 'badge ' + (presencial ? 'badge-red' : 'badge-blue');
     badgeEl.textContent = presencial ? 'Presencial' : 'WhatsApp';
   }
 
   const wppZone = document.getElementById('wpp-zone-' + idx);
-  if (wppZone) {
-    wppZone.innerHTML = gerarBotoesWpp(row, presencial, assistente);
-  }
+  if (wppZone) wppZone.innerHTML = gerarBotoesWpp(row, presencial, assistente);
 
   atualizarStats();
 }
@@ -499,9 +571,9 @@ function gerarBotoesWpp(row, presencial, assistente) {
   if (presencial) {
     return `<button class="btn btn-red" disabled><i class="ti ti-phone-off"></i> Sem número</button>`;
   }
-  const t    = String(row.tel).replace(/\D/g, '');
-  const full = t.startsWith('55') ? t : '55' + t;
-  const msg  = encodeURIComponent(gerarMensagemWpp(row, assistente));
+  const t       = String(row.tel).replace(/\D/g, '');
+  const full    = t.startsWith('55') ? t : '55' + t;
+  const msg     = encodeURIComponent(gerarMensagemWpp(row, assistente));
   const linkWeb = `https://web.whatsapp.com/send?phone=${full}&text=${msg}`;
   const linkApp = `https://wa.me/${full}?text=${msg}`;
   return `
@@ -580,11 +652,11 @@ function renderCards() {
   }
 
   container.innerHTML = filtrados.map(({ row, idx }) => {
+    row._idx = idx;
     const invalido   = isNumeroInvalido(row.tel);
     const presencial = invalido || !!presencialMemoria[row.remessa];
     const lider      = lideresMemoria[row.base] || '';
-
-    const wppHTML = gerarBotoesWpp(row, presencial, assistente);
+    const wppHTML    = gerarBotoesWpp(row, presencial, assistente);
 
     return `
     <div class="card ${presencial ? 'presencial' : ''}" id="card-${idx}">
@@ -609,11 +681,18 @@ function renderCards() {
         <button class="btn btn-blue" id="btn-copy-${idx}" onclick="copiarFeishu(${idx})">
           <i class="ti ti-copy"></i> Copiar template Feishu
         </button>
-        <span style="font-size:12px;color:#aaa;">@ Líder:</span>
-        <input class="lider-input" type="text" placeholder="Nome do líder" value="${lider}" oninput="salvarLider(${JSON.stringify(row.base)}, this.value)">
+        <span style="font-size:12px;color:var(--text-hint);">@ Líder:</span>
+        <input
+          class="lider-input"
+          id="lider-input-${idx}"
+          type="text"
+          placeholder="Nome do líder"
+          value="${lider}"
+          oninput="salvarLider(${JSON.stringify(row.base)}, this.value)"
+        >
         ${!invalido ? `
         <label class="toggle-label">
-          <input type="checkbox" ${presencialMemoria[row.remessa] ? 'checked' : ''} onchange="togglePresencial(${idx}, this.checked)">
+          <input type="checkbox" id="chk-presencial-${idx}" ${presencialMemoria[row.remessa] ? 'checked' : ''} onchange="togglePresencial(${idx}, this.checked)">
           Presencial
         </label>` : ''}
       </div>
@@ -625,9 +704,9 @@ function renderCards() {
 function recriarInputArquivo() {
   const old = document.getElementById('file-input');
   const novo = document.createElement('input');
-  novo.type = 'file';
-  novo.id = 'file-input';
-  novo.accept = '.xlsx,.xls';
+  novo.type    = 'file';
+  novo.id      = 'file-input';
+  novo.accept  = '.xlsx,.xls';
   novo.style.display = 'none';
   novo.addEventListener('change', handleFileChange);
   old.replaceWith(novo);
@@ -637,6 +716,7 @@ function recriarInputArquivo() {
 function handleFileChange(e) {
   const file = e.target.files[0];
   if (!file) return;
+  e.target.value = '';
   const reader = new FileReader();
   reader.onload = function(ev) {
     try {
@@ -645,16 +725,13 @@ function handleFileChange(e) {
       const raw     = XLSX.utils.sheet_to_json(wb.Sheets[abaNome], { defval: '', raw: true });
       if (!raw.length) { alert('Planilha vazia.'); return; }
 
-      const cols = Object.keys(raw[0]);
-      const sig  = assinatura(cols);
-
+      const cols      = Object.keys(raw[0]);
+      const sig       = assinatura(cols);
       const mapaSalvo = carregarMapeamento(sig);
       const foiSalvo  = !!mapaSalvo;
 
       const mapaAuto = {};
-      CAMPOS.forEach(campo => {
-        mapaAuto[campo.id] = detectarColuna(cols, campo.candidatos);
-      });
+      CAMPOS.forEach(campo => { mapaAuto[campo.id] = detectarColuna(cols, campo.candidatos); });
 
       const mapaInicial = mapaSalvo || mapaAuto;
 
@@ -670,7 +747,7 @@ function handleFileChange(e) {
     }
   };
   reader.readAsArrayBuffer(file);
-};
+}
 
 document.getElementById('file-input').addEventListener('change', handleFileChange);
 document.getElementById('filter-base').addEventListener('change', renderCards);
