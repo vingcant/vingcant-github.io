@@ -532,7 +532,13 @@
       document.execCommand('copy'); document.body.removeChild(ta); cb();
     }
 
-    function salvarLider(base, nome) { lideresMemoria[base] = nome; persistirLideres(); }
+    function salvarLider(base, nome, origem) {
+      lideresMemoria[base] = nome;
+      persistirLideres();
+      document.querySelectorAll('.lider-input[data-base]').forEach(el => {
+        if (el.dataset.base === base && el !== origem) el.value = nome;
+      });
+    }
 
     function togglePresencial(idx, checked) {
       const row = dadosGlobal[idx];
@@ -675,7 +681,8 @@
               type="text"
               placeholder="Nome do líder"
               value="${lider}"
-              oninput="salvarLider(${JSON.stringify(row.base)}, this.value)"
+              data-base="${row.base.replace(/"/g, '&quot;')}"
+              oninput="salvarLider(this.dataset.base, this.value, this)"
             >
             ${!invalido ? `
             <label class="toggle-label">
