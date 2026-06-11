@@ -602,17 +602,19 @@
       renderCards();
     }
 
-    // Varre todos os inputs de líder visíveis e salva antes de recriar os cards
-    function coletarLideresVisiveis() {
+    // Atualiza apenas as URLs dos botões WhatsApp sem recriar os cards
+    function atualizarBotoesWpp() {
+      const assistente = document.getElementById('assistente-input').value.trim() || 'Atendente';
       dadosGlobal.forEach((row, idx) => {
-        const el = document.getElementById('lider-input-' + idx);
-        if (el) { lideresMemoria[row.base] = el.value; }
+        const zone = document.getElementById('wpp-zone-' + idx);
+        if (!zone) return;
+        const invalido = isNumeroInvalido(row.tel);
+        const presencial = invalido || !!presencialMemoria[row.remessa];
+        zone.innerHTML = gerarBotoesWpp(row, presencial, assistente);
       });
-      persistirLideres();
     }
 
     function renderCards() {
-      coletarLideresVisiveis();
       const container = document.getElementById('cards-container');
       const filtroBase = document.getElementById('filter-base').value;
       const filtroProblema = document.getElementById('filter-problema').value;
@@ -731,7 +733,7 @@
     document.getElementById('filter-search').addEventListener('input', renderCards);
     document.getElementById('assistente-input').addEventListener('input', (e) => {
       localStorage.setItem('atendente', e.target.value);
-      if (dadosGlobal.length) renderCards();
+      if (dadosGlobal.length) atualizarBotoesWpp();
     });
   </script>
 </body>
